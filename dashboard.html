@@ -1,240 +1,128 @@
 <!DOCTYPE html>
 <html lang="uz">
-
 <head>
-    <meta charset="UTF-8">
-    <title>Market Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 1300px;
-            margin: 30px auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px #ccc;
-        }
-
-        h1,
-        h2 {
-            color: #2c3e50;
-        }
-
-        .flex {
-            display: flex;
-            gap: 30px;
-        }
-
-        .dashboard-section,
-        .form-section {
-            flex: 1;
-        }
-
-        .products-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .product-card {
-            background: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 1px 4px #bbb;
-            width: 180px;
-            padding: 12px;
-            text-align: center;
-            position: relative;
-        }
-
-        .product-card img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 6px;
-        }
-
-        .product-card .name {
-            font-weight: bold;
-            margin: 8px 0 4px 0;
-        }
-
-        .product-card .stock {
-            color: #2980b9;
-            font-size: 16px;
-        }
-
-        .product-card .expiry {
-            font-size: 13px;
-            color: #888;
-        }
-
-        .product-card .actions {
-            margin-top: 8px;
-        }
-
-        .btn {
-            background: #27ae60;
-            color: #fff;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .btn:active {
-            background: #219150;
-        }
-
-        .btn-danger {
-            background: #e74c3c;
-        }
-
-        .btn-print {
-            background: #2980b9;
-            margin-top: 10px;
-        }
-
-        .input-small {
-            width: 60px;
-        }
-
-        .input-medium {
-            width: 120px;
-        }
-
-        .mb-10 {
-            margin-bottom: 10px;
-        }
-
-        .order-table {
-            margin-top: 10px;
-        }
-
-        .order-list {
-            max-height: 250px;
-            overflow-y: auto;
-        }
-
-        .chart-container {
-            background: #f9f9f9;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-
-            #print-section,
-            #print-section * {
-                visibility: visible;
-            }
-
-            #print-section {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
-        }
-    </style>
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8">
+  <title>Market Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+    .container { max-width: 1300px; margin: 30px auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 8px #ccc; }
+    h1, h2 { color: #2c3e50; }
+    .flex { display: flex; gap: 30px; }
+    .dashboard-section, .form-section { flex: 1; }
+    .products-grid { display: flex; flex-wrap: wrap; gap: 20px; }
+    .product-card {
+      background: #f9f9f9; border-radius: 8px; box-shadow: 0 1px 4px #bbb;
+      width: 180px; padding: 12px; text-align: center; position: relative;
+    }
+    .product-card img { width: 100px; height: 100px; object-fit: cover; border-radius: 6px; }
+    .product-card .name { font-weight: bold; margin: 8px 0 4px 0; }
+    .product-card .stock { color: #2980b9; font-size: 16px; }
+    .product-card .expiry { font-size: 13px; color: #888; }
+    .product-card .actions { margin-top: 8px; }
+    .btn { background: #27ae60; color: #fff; border: none; padding: 6px 14px; border-radius: 5px; cursor: pointer; }
+    .btn:active { background: #219150; }
+    .btn-danger { background: #e74c3c; }
+    .btn-print { background: #2980b9; margin-top: 10px; }
+    .input-small { width: 60px; }
+    .input-medium { width: 120px; }
+    .mb-10 { margin-bottom: 10px; }
+    .order-table { margin-top: 10px; }
+    .order-list { max-height: 250px; overflow-y: auto; }
+    .chart-container { background: #f9f9f9; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+    @media print {
+      body * { visibility: hidden; }
+      #print-section, #print-section * { visibility: visible; }
+      #print-section { position: absolute; left: 0; top: 0; width: 100%; }
+    }
+  </style>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
-    <div class="container">
-        <h1>Market Dashboard</h1>
-        <div class="chart-container">
-            <canvas id="mainChart" height="60"></canvas>
-        </div>
-        <div class="flex">
-            <!-- Dashboard Section -->
-            <div class="dashboard-section">
-                <h2>Mahsulotlar Ombori</h2>
-                <div class="products-grid" id="products-grid"></div>
-                <button class="btn" onclick="showProductForm()">+ Mahsulot qo'shish</button>
-                <div id="product-form" style="display:none; margin-top:10px;">
-                    <input type="text" id="pname" placeholder="Mahsulot nomi" class="input-medium mb-10">
-                    <input type="number" id="pstock" placeholder="Qoldiq" class="input-small mb-10">
-                    <input type="date" id="pexp" class="mb-10">
-                    <input type="number" id="pprice" placeholder="Narxi" class="input-small mb-10">
-                    <input type="number" id="psale" placeholder="Sotuv narxi" class="input-small mb-10">
-                    <input type="url" id="pimg" placeholder="Rasm URL" class="input-medium mb-10">
-                    <button class="btn" onclick="addProduct()">Saqlash</button>
-                    <button class="btn btn-danger" onclick="hideProductForm()">Bekor qilish</button>
-                </div>
-            </div>
-            <!-- Order Section -->
-            <div class="form-section">
-                <h2>Buyurtma Qabul Qilish</h2>
-                <form id="order-form" onsubmit="addOrder(event)">
-                    <div class="mb-10">
-                        <input type="text" id="customer" placeholder="Mijoz ismi" required class="input-medium">
-                        <input type="date" id="order-date" required class="input-medium">
-                    </div>
-                    <div class="mb-10">
-                        <select id="order-product" class="input-medium"></select>
-                        <input type="number" id="order-qty" placeholder="Miqdori" min="1" class="input-small">
-                        <button type="button" class="btn" onclick="addToOrderTable()">Qo'shish</button>
-                    </div>
-                    <table class="order-table" id="order-table">
-                        <thead>
-                            <tr>
-                                <th>Mahsulot</th>
-                                <th>Miqdori</th>
-                                <th>Amal</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                    <button type="submit" class="btn">Buyurtmani saqlash</button>
-                </form>
-            </div>
-        </div>
-        <!-- Orders List -->
-        <h2>Buyurtmalar Bazasi</h2>
-        <div class="order-list">
-            <table id="orders-list">
-                <thead>
-                    <tr>
-                        <th>№</th>
-                        <th>Mijoz</th>
-                        <th>Sana</th>
-                        <th>Mahsulotlar</th>
-                        <th>Jami (so'm)</th>
-                        <th>Printer</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
+  <div class="container">
+    <h1>Market Dashboard</h1>
+    <div class="chart-container">
+      <canvas id="mainChart" height="60"></canvas>
     </div>
-    <!-- Print Section (hidden) -->
-    <div id="print-section" style="display:none;"></div>
-    <script>
-        // Mahsulotlar va buyurtmalar bazasi (localStorage orqali saqlanadi)
-        let products = JSON.parse(localStorage.getItem('products') || '[]');
-        let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-        let currentOrderProducts = [];
-        let kirim = JSON.parse(localStorage.getItem('kirim') || '[]');
-        let chiqim = JSON.parse(localStorage.getItem('chiqim') || '[]');
-        let foyda = JSON.parse(localStorage.getItem('foyda') || '[]');
+    <div class="flex">
+      <!-- Dashboard Section -->
+      <div class="dashboard-section">
+        <h2>Mahsulotlar Ombori</h2>
+        <div class="products-grid" id="products-grid"></div>
+        <button class="btn" onclick="showProductForm()">+ Mahsulot qo'shish</button>
+        <div id="product-form" style="display:none; margin-top:10px;">
+          <input type="text" id="pname" placeholder="Mahsulot nomi" class="input-medium mb-10">
+          <input type="number" id="pstock" placeholder="Qoldiq" class="input-small mb-10">
+          <input type="date" id="pexp" class="mb-10">
+          <input type="number" id="pprice" placeholder="Narxi" class="input-small mb-10">
+          <input type="number" id="psale" placeholder="Sotuv narxi" class="input-small mb-10">
+          <input type="url" id="pimg" placeholder="Rasm URL" class="input-medium mb-10">
+          <button class="btn" onclick="addProduct()">Saqlash</button>
+          <button class="btn btn-danger" onclick="hideProductForm()">Bekor qilish</button>
+        </div>
+      </div>
+      <!-- Order Section -->
+      <div class="form-section">
+        <h2>Buyurtma Qabul Qilish</h2>
+        <form id="order-form" onsubmit="addOrder(event)">
+          <div class="mb-10">
+            <input type="text" id="customer" placeholder="Mijoz ismi" required class="input-medium">
+            <input type="date" id="order-date" required class="input-medium">
+          </div>
+          <div class="mb-10">
+            <select id="order-product" class="input-medium"></select>
+            <input type="number" id="order-qty" placeholder="Miqdori" min="1" class="input-small">
+            <button type="button" class="btn" onclick="addToOrderTable()">Qo'shish</button>
+          </div>
+          <table class="order-table" id="order-table">
+            <thead>
+              <tr>
+                <th>Mahsulot</th>
+                <th>Miqdori</th>
+                <th>Amal</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <button type="submit" class="btn">Buyurtmani saqlash</button>
+        </form>
+      </div>
+    </div>
+    <!-- Orders List -->
+    <h2>Buyurtmalar Bazasi</h2>
+    <div class="order-list">
+      <table id="orders-list">
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Mijoz</th>
+            <th>Sana</th>
+            <th>Mahsulotlar</th>
+            <th>Jami (so'm)</th>
+            <th>Printer</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <!-- Print Section (hidden) -->
+  <div id="print-section" style="display:none;"></div>
+  <script>
+    // Mahsulotlar va buyurtmalar bazasi (localStorage orqali saqlanadi)
+    let products = JSON.parse(localStorage.getItem('products') || '[]');
+    let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    let currentOrderProducts = [];
+    let kirim = JSON.parse(localStorage.getItem('kirim') || '[]');
+    let chiqim = JSON.parse(localStorage.getItem('chiqim') || '[]');
+    let foyda = JSON.parse(localStorage.getItem('foyda') || '[]');
 
-        // Dashboardni yangilash
-        function renderProducts() {
-            const grid = document.getElementById('products-grid');
-            grid.innerHTML = '';
-            products.forEach((p, i) => {
-                grid.innerHTML += `
+    // Dashboardni yangilash
+    function renderProducts() {
+      const grid = document.getElementById('products-grid');
+      grid.innerHTML = '';
+      products.forEach((p, i) => {
+        grid.innerHTML += `
           <div class="product-card">
             <img src="${p.img || 'https://via.placeholder.com/100'}" alt="Rasm">
             <div class="name">${p.name}</div>
@@ -245,174 +133,184 @@
             <div class="actions">
               <button class="btn" onclick="changeStock(${i}, 1)">Kirim +</button>
               <button class="btn btn-danger" onclick="changeStock(${i}, -1)">Chiqim -</button>
+              <button class="btn btn-danger" onclick="deleteProduct(${i})">O'chirish</button>
             </div>
           </div>
         `;
-            });
-            updateOrderProductSelect();
-            updateChart();
-        }
+      });
+      updateOrderProductSelect();
+      updateChart();
+    }
 
-        // Mahsulot qo'shish formasi
-        function showProductForm() {
-            document.getElementById('product-form').style.display = 'block';
-        }
-        function hideProductForm() {
-            document.getElementById('product-form').style.display = 'none';
-            document.getElementById('pname').value = '';
-            document.getElementById('pstock').value = '';
-            document.getElementById('pexp').value = '';
-            document.getElementById('pprice').value = '';
-            document.getElementById('psale').value = '';
-            document.getElementById('pimg').value = '';
-        }
-        function addProduct() {
-            const name = document.getElementById('pname').value.trim();
-            const stock = parseInt(document.getElementById('pstock').value);
-            const expiry = document.getElementById('pexp').value;
-            const price = parseInt(document.getElementById('pprice').value);
-            const sale = parseInt(document.getElementById('psale').value);
-            const img = document.getElementById('pimg').value.trim();
-            if (!name || isNaN(stock) || !expiry || isNaN(price) || isNaN(sale)) {
-                alert('Barcha maydonlarni to\'ldiring!');
-                return;
-            }
-            products.push({ name, stock, expiry, price, sale, img });
-            kirim.push({ name, qty: stock, date: new Date().toISOString().slice(0, 10) });
-            localStorage.setItem('products', JSON.stringify(products));
-            localStorage.setItem('kirim', JSON.stringify(kirim));
-            hideProductForm();
-            renderProducts();
-        }
+    // Mahsulotni o'chirish
+    function deleteProduct(idx) {
+      if (confirm("Ushbu mahsulotni o'chirishga ishonchingiz komilmi?")) {
+        products.splice(idx, 1);
+        localStorage.setItem('products', JSON.stringify(products));
+        renderProducts();
+      }
+    }
 
-        // Kirim/chiqim
-        function changeStock(idx, delta) {
-            if (delta > 0) {
-                let qty = prompt("Kirim miqdorini kiriting:", "1");
-                qty = parseInt(qty);
-                if (isNaN(qty) || qty < 1) return;
-                products[idx].stock += qty;
-                kirim.push({ name: products[idx].name, qty, date: new Date().toISOString().slice(0, 10) });
-                localStorage.setItem('kirim', JSON.stringify(kirim));
-            } else {
-                let qty = prompt("Chiqim miqdorini kiriting:", "1");
-                qty = parseInt(qty);
-                if (isNaN(qty) || qty < 1) return;
-                if (products[idx].stock < qty) {
-                    alert('Omborda yetarli mahsulot yo‘q!');
-                    return;
-                }
-                products[idx].stock -= qty;
-                chiqim.push({ name: products[idx].name, qty, date: new Date().toISOString().slice(0, 10) });
-                localStorage.setItem('chiqim', JSON.stringify(chiqim));
-            }
-            localStorage.setItem('products', JSON.stringify(products));
-            renderProducts();
-        }
+    // Mahsulot qo'shish formasi
+    function showProductForm() {
+      document.getElementById('product-form').style.display = 'block';
+    }
+    function hideProductForm() {
+      document.getElementById('product-form').style.display = 'none';
+      document.getElementById('pname').value = '';
+      document.getElementById('pstock').value = '';
+      document.getElementById('pexp').value = '';
+      document.getElementById('pprice').value = '';
+      document.getElementById('psale').value = '';
+      document.getElementById('pimg').value = '';
+    }
+    function addProduct() {
+      const name = document.getElementById('pname').value.trim();
+      const stock = parseInt(document.getElementById('pstock').value);
+      const expiry = document.getElementById('pexp').value;
+      const price = parseInt(document.getElementById('pprice').value);
+      const sale = parseInt(document.getElementById('psale').value);
+      const img = document.getElementById('pimg').value.trim();
+      if (!name || isNaN(stock) || !expiry || isNaN(price) || isNaN(sale)) {
+        alert('Barcha maydonlarni to\'ldiring!');
+        return;
+      }
+      products.push({ name, stock, expiry, price, sale, img });
+      kirim.push({name, qty: stock, date: new Date().toISOString().slice(0,10)});
+      localStorage.setItem('products', JSON.stringify(products));
+      localStorage.setItem('kirim', JSON.stringify(kirim));
+      hideProductForm();
+      renderProducts();
+    }
 
-        // Buyurtma uchun mahsulotlar selectini yangilash
-        function updateOrderProductSelect() {
-            const select = document.getElementById('order-product');
-            select.innerHTML = '';
-            products.forEach((p, i) => {
-                select.innerHTML += `<option value="${i}">${p.name} (Qoldiq: ${p.stock})</option>`;
-            });
+    // Kirim/chiqim
+    function changeStock(idx, delta) {
+      if (delta > 0) {
+        let qty = prompt("Kirim miqdorini kiriting:", "1");
+        qty = parseInt(qty);
+        if (isNaN(qty) || qty < 1) return;
+        products[idx].stock += qty;
+        kirim.push({name: products[idx].name, qty, date: new Date().toISOString().slice(0,10)});
+        localStorage.setItem('kirim', JSON.stringify(kirim));
+      } else {
+        let qty = prompt("Chiqim miqdorini kiriting:", "1");
+        qty = parseInt(qty);
+        if (isNaN(qty) || qty < 1) return;
+        if (products[idx].stock < qty) {
+          alert('Omborda yetarli mahsulot yo‘q!');
+          return;
         }
+        products[idx].stock -= qty;
+        chiqim.push({name: products[idx].name, qty, date: new Date().toISOString().slice(0,10)});
+        localStorage.setItem('chiqim', JSON.stringify(chiqim));
+      }
+      localStorage.setItem('products', JSON.stringify(products));
+      renderProducts();
+    }
 
-        // Buyurtmaga mahsulot qo'shish
-        function addToOrderTable() {
-            const idx = document.getElementById('order-product').value;
-            const qty = parseInt(document.getElementById('order-qty').value);
-            if (isNaN(qty) || qty < 1) {
-                alert('Miqdor noto\'g\'ri!');
-                return;
-            }
-            if (qty > products[idx].stock) {
-                alert('Omborda yetarli mahsulot yo\'q!');
-                return;
-            }
-            // Agar mahsulot allaqachon buyurtmada bo‘lsa, miqdorini oshiramiz
-            const exist = currentOrderProducts.find(x => x.idx == idx);
-            if (exist) {
-                if (exist.qty + qty > products[idx].stock) {
-                    alert('Omborda yetarli mahsulot yo\'q!');
-                    return;
-                }
-                exist.qty += qty;
-            } else {
-                currentOrderProducts.push({ idx, qty });
-            }
-            renderOrderTable();
-            document.getElementById('order-qty').value = '';
+    // Buyurtma uchun mahsulotlar selectini yangilash
+    function updateOrderProductSelect() {
+      const select = document.getElementById('order-product');
+      select.innerHTML = '';
+      products.forEach((p, i) => {
+        select.innerHTML += `<option value="${i}">${p.name} (Qoldiq: ${p.stock})</option>`;
+      });
+    }
+
+    // Buyurtmaga mahsulot qo'shish
+    function addToOrderTable() {
+      const idx = document.getElementById('order-product').value;
+      const qty = parseInt(document.getElementById('order-qty').value);
+      if (isNaN(qty) || qty < 1) {
+        alert('Miqdor noto\'g\'ri!');
+        return;
+      }
+      if (qty > products[idx].stock) {
+        alert('Omborda yetarli mahsulot yo\'q!');
+        return;
+      }
+      // Agar mahsulot allaqachon buyurtmada bo‘lsa, miqdorini oshiramiz
+      const exist = currentOrderProducts.find(x => x.idx == idx);
+      if (exist) {
+        if (exist.qty + qty > products[idx].stock) {
+          alert('Omborda yetarli mahsulot yo\'q!');
+          return;
         }
+        exist.qty += qty;
+      } else {
+        currentOrderProducts.push({ idx, qty });
+      }
+      renderOrderTable();
+      document.getElementById('order-qty').value = '';
+    }
 
-        // Buyurtmadagi mahsulotlar jadvali
-        function renderOrderTable() {
-            const tbody = document.querySelector('#order-table tbody');
-            tbody.innerHTML = '';
-            currentOrderProducts.forEach((item, i) => {
-                tbody.innerHTML += `
+    // Buyurtmadagi mahsulotlar jadvali
+    function renderOrderTable() {
+      const tbody = document.querySelector('#order-table tbody');
+      tbody.innerHTML = '';
+      currentOrderProducts.forEach((item, i) => {
+        tbody.innerHTML += `
           <tr>
             <td>${products[item.idx].name}</td>
             <td>${item.qty}</td>
             <td><button class="btn btn-danger" onclick="removeOrderProduct(${i})">O'chirish</button></td>
           </tr>
         `;
-            });
-        }
-        function removeOrderProduct(i) {
-            currentOrderProducts.splice(i, 1);
-            renderOrderTable();
-        }
+      });
+    }
+    function removeOrderProduct(i) {
+      currentOrderProducts.splice(i, 1);
+      renderOrderTable();
+    }
 
-        // Buyurtmani saqlash
-        function addOrder(e) {
-            e.preventDefault();
-            const customer = document.getElementById('customer').value.trim();
-            const date = document.getElementById('order-date').value;
-            if (!customer || !date || currentOrderProducts.length === 0) {
-                alert('Barcha maydonlarni to\'ldiring va mahsulot qo\'shing!');
-                return;
-            }
-            let jami = 0, jamiFoyda = 0;
-            // Ombordan mahsulotlarni chiqaramiz va foyda hisoblaymiz
-            for (const item of currentOrderProducts) {
-                products[item.idx].stock -= item.qty;
-                chiqim.push({ name: products[item.idx].name, qty: item.qty, date });
-                jami += products[item.idx].sale * item.qty;
-                jamiFoyda += (products[item.idx].sale - products[item.idx].price) * item.qty;
-            }
-            foyda.push({ date, value: jamiFoyda });
-            localStorage.setItem('products', JSON.stringify(products));
-            localStorage.setItem('chiqim', JSON.stringify(chiqim));
-            localStorage.setItem('foyda', JSON.stringify(foyda));
-            // Buyurtmani bazaga qo‘shamiz
-            orders.push({
-                customer,
-                date,
-                items: currentOrderProducts.map(x => ({
-                    name: products[x.idx].name,
-                    qty: x.qty,
-                    sale: products[x.idx].sale
-                })),
-                jami
-            });
-            localStorage.setItem('orders', JSON.stringify(orders));
-            currentOrderProducts = [];
-            renderOrderTable();
-            renderProducts();
-            renderOrders();
-            document.getElementById('order-form').reset();
-        }
+    // Buyurtmani saqlash
+    function addOrder(e) {
+      e.preventDefault();
+      const customer = document.getElementById('customer').value.trim();
+      const date = document.getElementById('order-date').value;
+      if (!customer || !date || currentOrderProducts.length === 0) {
+        alert('Barcha maydonlarni to\'ldiring va mahsulot qo\'shing!');
+        return;
+      }
+      let jami = 0, jamiFoyda = 0;
+      // Ombordan mahsulotlarni chiqaramiz va foyda hisoblaymiz
+      for (const item of currentOrderProducts) {
+        products[item.idx].stock -= item.qty;
+        chiqim.push({name: products[item.idx].name, qty: item.qty, date});
+        jami += products[item.idx].sale * item.qty;
+        jamiFoyda += (products[item.idx].sale - products[item.idx].price) * item.qty;
+      }
+      foyda.push({date, value: jamiFoyda});
+      localStorage.setItem('products', JSON.stringify(products));
+      localStorage.setItem('chiqim', JSON.stringify(chiqim));
+      localStorage.setItem('foyda', JSON.stringify(foyda));
+      // Buyurtmani bazaga qo‘shamiz
+      orders.push({
+        customer,
+        date,
+        items: currentOrderProducts.map(x => ({
+          name: products[x.idx].name,
+          qty: x.qty,
+          sale: products[x.idx].sale
+        })),
+        jami
+      });
+      localStorage.setItem('orders', JSON.stringify(orders));
+      currentOrderProducts = [];
+      renderOrderTable();
+      renderProducts();
+      renderOrders();
+      document.getElementById('order-form').reset();
+    }
 
-        // Buyurtmalar ro‘yxati
-        function renderOrders() {
-            const tbody = document.querySelector('#orders-list tbody');
-            tbody.innerHTML = '';
-            orders.forEach((order, i) => {
-                tbody.innerHTML += `
+    // Buyurtmalar ro‘yxati
+    function renderOrders() {
+      const tbody = document.querySelector('#orders-list tbody');
+      tbody.innerHTML = '';
+      orders.forEach((order, i) => {
+        tbody.innerHTML += `
           <tr>
-            <td>${i + 1}</td>
+            <td>${i+1}</td>
             <td>${order.customer}</td>
             <td>${order.date}</td>
             <td>
@@ -424,13 +322,13 @@
             <td><button class="btn btn-print" onclick="printOrder(${i})">Print</button></td>
           </tr>
         `;
-            });
-        }
+      });
+    }
 
-        // Buyurtmani printerga chiqarish (sotib olingan narx ko‘rinmaydi!)
-        function printOrder(idx) {
-            const order = orders[idx];
-            let html = `
+    // Buyurtmani printerga chiqarish (sotib olingan narx ko‘rinmaydi!)
+    function printOrder(idx) {
+      const order = orders[idx];
+      let html = `
         <h2 style="text-align:center;">Buyurtma</h2>
         <p><b>Mijoz:</b> ${order.customer}</p>
         <p><b>Sana:</b> ${order.date}</p>
@@ -458,78 +356,77 @@
         <h3 style="text-align:center; margin-top:30px;">Buyurtmangiz uchun rahmat!</h3>
         <p style="margin-top:30px;">Imzo: ____________________</p>
       `;
-            const printSection = document.getElementById('print-section');
-            printSection.innerHTML = html;
-            printSection.style.display = 'block';
-            window.print();
-            printSection.style.display = 'none';
+      const printSection = document.getElementById('print-section');
+      printSection.innerHTML = html;
+      printSection.style.display = 'block';
+      window.print();
+      printSection.style.display = 'none';
+    }
+
+    // Diagramma (Chart.js)
+    let chart;
+    function updateChart() {
+      // Qoldiq, kirim, chiqim, foyda bo‘yicha statistikani tayyorlash
+      const labels = products.map(p => p.name);
+      const qoldiq = products.map(p => p.stock);
+      // Kirim va chiqim bo‘yicha umumiy miqdor
+      let kirimSum = products.map(p => kirim.filter(k => k.name === p.name).reduce((a,b)=>a+b.qty,0));
+      let chiqimSum = products.map(p => chiqim.filter(c => c.name === p.name).reduce((a,b)=>a+b.qty,0));
+      // Foyda bo‘yicha oxirgi 7 kun
+      let foydaLabels = [];
+      let foydaData = [];
+      let foydaByDate = {};
+      foyda.forEach(f => {
+        foydaByDate[f.date] = (foydaByDate[f.date]||0) + f.value;
+      });
+      Object.keys(foydaByDate).slice(-7).forEach(d => {
+        foydaLabels.push(d);
+        foydaData.push(foydaByDate[d]);
+      });
+
+      const ctx = document.getElementById('mainChart').getContext('2d');
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            { label: 'Qoldiq', data: qoldiq, backgroundColor: '#2980b9' },
+            { label: 'Kirim', data: kirimSum, backgroundColor: '#27ae60' },
+            { label: 'Chiqim', data: chiqimSum, backgroundColor: '#e67e22' }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: { display: true, text: 'Mahsulotlar statistikasi' }
+          }
         }
-
-        // Diagramma (Chart.js)
-        let chart;
-        function updateChart() {
-            // Qoldiq, kirim, chiqim, foyda bo‘yicha statistikani tayyorlash
-            const labels = products.map(p => p.name);
-            const qoldiq = products.map(p => p.stock);
-            // Kirim va chiqim bo‘yicha umumiy miqdor
-            let kirimSum = products.map(p => kirim.filter(k => k.name === p.name).reduce((a, b) => a + b.qty, 0));
-            let chiqimSum = products.map(p => chiqim.filter(c => c.name === p.name).reduce((a, b) => a + b.qty, 0));
-            // Foyda bo‘yicha oxirgi 7 kun
-            let foydaLabels = [];
-            let foydaData = [];
-            let foydaByDate = {};
-            foyda.forEach(f => {
-                foydaByDate[f.date] = (foydaByDate[f.date] || 0) + f.value;
-            });
-            Object.keys(foydaByDate).slice(-7).forEach(d => {
-                foydaLabels.push(d);
-                foydaData.push(foydaByDate[d]);
-            });
-
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            if (chart) chart.destroy();
-            chart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels,
-                    datasets: [
-                        { label: 'Qoldiq', data: qoldiq, backgroundColor: '#2980b9' },
-                        { label: 'Kirim', data: kirimSum, backgroundColor: '#27ae60' },
-                        { label: 'Chiqim', data: chiqimSum, backgroundColor: '#e67e22' }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        title: { display: true, text: 'Mahsulotlar statistikasi' }
-                    }
-                }
-            });
-            // Foyda uchun alohida chiziqli grafik
-            if (foydaLabels.length > 0) {
-                setTimeout(() => {
-                    let canvas = document.createElement('canvas');
-                    canvas.height = 40;
-                    document.querySelector('.chart-container').appendChild(canvas);
-                    new Chart(canvas.getContext('2d'), {
-                        type: 'line',
-                        data: {
-                            labels: foydaLabels,
-                            datasets: [{ label: 'Foyda', data: foydaData, borderColor: '#e74c3c', backgroundColor: '#f9c0c0', fill: true }]
-                        },
-                        options: {
-                            plugins: { title: { display: true, text: 'So‘nggi kunlardagi foyda' } }
-                        }
-                    });
-                }, 100);
+      });
+      // Foyda uchun alohida chiziqli grafik
+      if (foydaLabels.length > 0) {
+        setTimeout(() => {
+          let canvas = document.createElement('canvas');
+          canvas.height = 40;
+          document.querySelector('.chart-container').appendChild(canvas);
+          new Chart(canvas.getContext('2d'), {
+            type: 'line',
+            data: {
+              labels: foydaLabels,
+              datasets: [{ label: 'Foyda', data: foydaData, borderColor: '#e74c3c', backgroundColor: '#f9c0c0', fill: true }]
+            },
+            options: {
+              plugins: { title: { display: true, text: 'So‘nggi kunlardagi foyda' } }
             }
-        }
+          });
+        }, 100);
+      }
+    }
 
-        // Boshlang‘ich render
-        renderProducts();
-        renderOrders();
-        renderOrderTable();
-    </script>
+    // Boshlang‘ich render
+    renderProducts();
+    renderOrders();
+    renderOrderTable();
+  </script>
 </body>
-
 </html>
